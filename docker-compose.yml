@@ -1,0 +1,27 @@
+services:
+  backend:
+    build: ./backend
+    image: mystock-backend:latest
+    container_name: mystock-backend
+    env_file: .env
+    volumes:
+      - ./data:/data:rw
+    # Socket API is reachable only on the compose network (not published to the host).
+    expose:
+      - "9090"
+    restart: unless-stopped
+
+  frontend:
+    build: ./frontend
+    image: mystock-frontend:latest
+    container_name: mystock-frontend
+    env_file: .env
+    environment:
+      MYSTOCK_API_HOST: backend
+    ports:
+      - "8443:8443"
+    volumes:
+      - ./ssl:/ssl:ro
+    depends_on:
+      - backend
+    restart: unless-stopped
